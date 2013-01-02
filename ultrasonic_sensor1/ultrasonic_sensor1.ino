@@ -1,12 +1,18 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(4,5,6,7,8,9);
 
 const int pingPin  = 2;
 const int echoPin  = 3;
-const int warningPin = 4;
-const int unwarningPin = 5;
+const int warningPin = 10;
+const int unwarningPin = 11;
 
 void setup() {
-  //pinMode(powerPin, OUTPUT); // attach pin 2 to vcc
-  //pinMode(5, OUTPUT); // attach pin 5 to GND
+  lcd.begin(16, 2);
+  lcd.write("Starting Up...");
+  delay(500);
+  lcd.clear();
+  
   pinMode(pingPin,      OUTPUT);
   pinMode(echoPin,      INPUT);
   pinMode(warningPin,   OUTPUT);
@@ -15,8 +21,6 @@ void setup() {
   digitalWrite(pingPin, LOW);
   digitalWrite(warningPin, LOW);
   digitalWrite(unwarningPin, LOW);
-  
-  Serial.begin(9600);
 }
 
 // Ping (an 8 cycle sonic burst) is triggered by a short
@@ -35,26 +39,41 @@ long ping()
 
 void process_ping(long usec)
 {
-  long centimeters;
-  long inches;
-  centimeters = distance_in_centimeters(usec);
-  inches      = distance_in_inches(usec);
-  if (inches < 24)
+  long tenth_of_meters;
+  long tenth_of_feet;
+  
+  tenth_of_meters = distance_in_tenth_of_meters(usec);
+  tenth_of_feet   = distance_in_tenth_of_feet(usec);
+  
+  lcd.clear();
+  lcd.setCursor(0,0);
+  
+  lcd.print(tenth_of_meters / 10);
+  lcd.print(".");
+  lcd.print(tenth_of_meters % 10);
+  lcd.print(" meters");
+  
+  lcd.setCursor(0,1);
+  
+  lcd.print(tenth_of_feet / 10);
+  lcd.print(".");
+  lcd.print(tenth_of_feet % 10);
+  lcd.print(" feet");
+  
+  if (tenth_of_feet <= 10)
   {
     digitalWrite(warningPin, HIGH);
     digitalWrite(unwarningPin, LOW);
+    lcd.setCursor(15,0);
+    lcd.write("*");
   }
   else
   {
     digitalWrite(warningPin, LOW);
     digitalWrite(unwarningPin, HIGH);
+    lcd.setCursor(15,0);
+    lcd.write(" ");
   }
-  
-  Serial.print(centimeters);
-  Serial.print(" cm | ");
-  Serial.print(inches);
-  Serial.print(" in");
-  Serial.println();
 }
 
 void loop()
@@ -74,11 +93,23 @@ long distance_in_centimeters(long usec)
   return usec / 59;
 }
 
+long distance_in_tenth_of_meters(long usec)
+{
+  return usec / 588;
+}
+
 // The speed of sound is 340 m/s, 13385.8 in/s
 // This is equivalent to 74.7 us/in
 long distance_in_inches(long usec)
 {
   return usec / 149;
+}
+
+// The speed of sound is 340 m/s, 13385.8 in/s
+// This is equivalent to 89.6 us/in
+long distance_in_tenth_of_feet(long usec)
+{
+  return usec / 170;
 }
 
 
