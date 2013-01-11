@@ -4,14 +4,6 @@ const int pingPin  = 2;
 const int echoPin  = 3;
 const int tonePin  = 8;
 
-// notes in the melody:
-int melody[] = {
-  NOTE_C4, NOTE_G3,NOTE_G3, NOTE_A3, NOTE_G3,0, NOTE_B3, NOTE_C4};
-
-// note durations: 4 = quarter note, 8 = eighth note, etc.:
-int noteDurations[] = {
-  4, 8, 8, 4,4,4,4,4 };
-
 void setup() {
   pinMode(pingPin,      OUTPUT);
   pinMode(echoPin,      INPUT);
@@ -34,23 +26,12 @@ long ping()
 
 void process_ping(long usec)
 {
-  long tenth_of_meters;
-  long tenth_of_feet;
-  
-  //tenth_of_meters = distance_in_tenth_of_meters(usec);
-  //tenth_of_feet   = distance_in_tenth_of_feet(usec);
   tone(tonePin, usec);
 }
 
 void loop()
 {  
   process_ping(ping());
-  delay(60);             // 60ms delay
+  delay(30);             // 60ms delay
 }
 
-// The speed of sound is 340 m/s, 13385.8 in/s
-// This is equivalent to 74.7 us/in
-long distance_in_inches(long usec)
-{
-  return usec / 149;
-}
